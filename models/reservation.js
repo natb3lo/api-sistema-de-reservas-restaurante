@@ -27,6 +27,8 @@ Reservation.init(
   {
     sequelize,
     modelName: "Reservation",
+    freezeTableName: true,
+    timestamps: false,
   }
 );
 

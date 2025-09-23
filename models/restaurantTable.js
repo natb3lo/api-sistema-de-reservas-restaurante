@@ -24,6 +24,8 @@ RestaurantTable.init(
   {
     sequelize,
     modelName: "Table",
+    freezeTableName: true,
+    timestamps: false,
   }
 );
 
