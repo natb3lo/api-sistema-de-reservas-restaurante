@@ -1,20 +1,23 @@
 const express = require("express");
-const { registerValidator } = require("../middlewares/authMiddleware");
+const {
+  userAuthentication,
+  userRegistration,
+  registerValidatonFields,
+  loginValidatonFields,
+} = require("../middlewares/authMiddleware");
 const validateResult = require("../middlewares/validateResult");
-const hashPassword = require("../middlewares/hashPassword");
 const generateToken = require("../middlewares/generateToken");
-const { registerUser } = require("../controllers/userController");
 const router = express.Router();
 
-//router.get("/login");
+// GET: /auth/login
+router.get("/login", loginValidatonFields, userAuthentication, generateToken);
 
 // POST: /auth/register
 router.post(
   "/register",
-  registerValidator,
+  registerValidatonFields,
   validateResult,
-  hashPassword,
-  registerUser,
+  userRegistration,
   generateToken
 );
 

@@ -9,4 +9,8 @@ const hash = async (plainTextPassword) => {
   }
 };
 
-module.exports = hash;
+const comparePassword = async (plainTextPassword, hashedPassword) => {
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
+};
+
+module.exports = { hash, comparePassword };

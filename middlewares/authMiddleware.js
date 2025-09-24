@@ -1,6 +1,8 @@
 const { body } = require("express-validator");
+const { createUser, findUserByEmail } = require("../services/userService");
+const { comparePassword, hash } = require("../utils/hash");
 
-const registerValidator = [
+const registerValidatonFields = [
   body("name").notEmpty().withMessage("You must provide a name"),
   body("email")
     .notEmpty()
@@ -20,4 +22,75 @@ const registerValidator = [
   }),
 ];
 
-module.exports = { registerValidator };
+const loginValidatonFields = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(400).json({
+      error:
+        "[AUTH_ERROR] Missing Authorization header. Use: Basic Auth <base64>",
+    });
+  }
+  if (!authHeader.startsWith("Basic ")) {
+    return res.status(400).json({
+      error:
+        "[AUTH_ERROR] Invalid Authorization header. Use: Basic Auth <base64>",
+    });
+  }
+
+  const [, hash] = authHeader.split(" ");
+  const [email, password] = Buffer.from(hash, "base64").toString().split(":");
+
+  req.auth = { email, password };
+
+  next();
+};
+
+const userAuthentication = async (req, res, next) => {
+  const { email, password } = req.auth;
+
+  try {
+    const user = await findUserByEmail(email, password);
+    const isMatch = comparePassword(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ error: "[AUTH_ERROR] Invalid credentials" });
+    }
+    req.user = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+    next();
+  } catch (error) {
+    console.log(error.message);
+    return res.status(401).json({ error: error.message });
+  }
+};
+
+const userRegistration = async (req, res, next) => {
+  const { name, email, password } = req.body;
+  const hashedPassword = await hash(password);
+  try {
+    const user = await createUser(name, email, hashedPassword);
+    req.user = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    };
+    next();
+  } catch (error) {
+    //console.log(error);
+    console.log(error.message);
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+module.exports = {
+  registerValidatonFields,
+  loginValidatonFields,
+  userAuthentication,
+  userRegistration,
+};

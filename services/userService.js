@@ -18,4 +18,12 @@ const createUser = async (name, email, password) => {
   }
 };
 
-module.exports = { createUser };
+const findUserByEmail = async (email, password) => {
+  const userExist = await User.findOne({ where: { email: email } });
+  if (!userExist) {
+    throw new Error("[AUTH_ERROR] Invalid credentials");
+  }
+  return userExist;
+};
+
+module.exports = { createUser, findUserByEmail };
