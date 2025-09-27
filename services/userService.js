@@ -17,7 +17,7 @@ const createUser = async (name, email, password) => {
   }
 };
 
-const findUserByEmail = async (email, password) => {
+const findUserByEmail = async (email) => {
   const userExist = await User.findOne({ where: { email: email } });
   if (!userExist) {
     throw new Error("[AUTH_ERROR] Invalid credentials");

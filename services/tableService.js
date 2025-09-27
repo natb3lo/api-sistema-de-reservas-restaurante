@@ -42,4 +42,16 @@ const updateTable = async (number, capacity, status) => {
   }
 };
 
-module.exports = { findAll, createTable, updateTable };
+const deleteTable = async (number) => {
+  try {
+    const table = await RestaurantTable.findOne({ where: { number: number } });
+    if (!table) {
+      throw new AppError("Provided table number does not exist", 400);
+    }
+    await table.destroy();
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports = { findAll, createTable, updateTable, deleteTable };

@@ -4,6 +4,7 @@ const {
   getTables,
   createRestaurantTable,
   updateRestaurantTable,
+  deleteRestauranteTable,
 } = require("../controllers/tableController");
 const authorize = require("../middlewares/authorization");
 const {
@@ -26,6 +27,7 @@ router.post(
   createRestaurantTable
 );
 
+// PATCH: /tables - Priviledged access route(Admin)
 router.patch(
   "/:number",
   validateUpdateTableFields,
@@ -33,6 +35,13 @@ router.patch(
   authenticate,
   authorize(new Set(["ADMIN"])),
   updateRestaurantTable
+);
+
+router.delete(
+  "/:number",
+  authenticate,
+  authorize(new Set(["ADMIN"])),
+  deleteRestauranteTable
 );
 
 module.exports = router;

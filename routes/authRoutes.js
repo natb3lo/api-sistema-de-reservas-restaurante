@@ -2,20 +2,22 @@ const express = require("express");
 const {
   userAuthentication,
   userRegistration,
-  registerValidatonFields,
-  loginValidatonFields,
 } = require("../middlewares/authMiddleware");
-const { validateResult } = require("../middlewares/validations");
+const {
+  validateResult,
+  validateLoginFields,
+  validateRegisterFields,
+} = require("../middlewares/validations");
 const generateToken = require("../middlewares/generateToken");
 const router = express.Router();
 
 // GET: /auth/login
-router.get("/login", loginValidatonFields, userAuthentication, generateToken);
+router.get("/login", validateLoginFields, userAuthentication, generateToken);
 
 // POST: /auth/register
 router.post(
   "/register",
-  registerValidatonFields,
+  validateRegisterFields,
   validateResult,
   userRegistration,
   generateToken

@@ -7,55 +7,14 @@ const {
 const { comparePassword, hash } = require("../utils/hash");
 const { verifyToken } = require("../utils/token");
 
-const registerValidatonFields = [
-  body("name").notEmpty().withMessage("You must provide a name"),
-  body("email")
-    .notEmpty()
-    .withMessage("You must provide an e-mail address")
-    .isEmail()
-    .withMessage("Not a valid e-mail address"),
-  body("password")
-    .notEmpty()
-    .withMessage("You must provide a password")
-    .isLength({ min: 5 })
-    .withMessage("Password must have at least 5 characters"),
-  body("passwordConfirmation").custom((value, { req }) => {
-    if (value !== req.body.password) {
-      throw new Error("Passwords do not match");
-    }
-    return true;
-  }),
-];
-
-const loginValidatonFields = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(400).json({
-      error:
-        "[AUTH_ERROR] Missing Authorization header. Use: Basic Auth <base64>",
-    });
-  }
-  if (!authHeader.startsWith("Basic ")) {
-    return res.status(400).json({
-      error:
-        "[AUTH_ERROR] Invalid Authorization header. Use: Basic Auth <base64>",
-    });
-  }
-
-  const [, hash] = authHeader.split(" ");
-  const [email, password] = Buffer.from(hash, "base64").toString().split(":");
-
-  req.auth = { email, password };
-
-  next();
-};
-
 const userAuthentication = async (req, res, next) => {
   const { email, password } = req.auth;
 
   try {
-    const user = await findUserByEmail(email, password);
-    const isMatch = comparePassword(password, user.password);
+    const user = await findUserByEmail(email);
+    console.log(user);
+    console.log("provided: " + password + "compared: " + user.password);
+    const isMatch = await comparePassword(password, user.password);
     if (!isMatch) {
       return res
         .status(401)
@@ -87,7 +46,6 @@ const userRegistration = async (req, res, next) => {
     };
     next();
   } catch (error) {
-    //console.log(error);
     console.log(error.message);
     return res.status(400).json({ error: error.message });
   }
@@ -112,8 +70,6 @@ const authenticate = async (req, res, next) => {
 };
 
 module.exports = {
-  registerValidatonFields,
-  loginValidatonFields,
   userAuthentication,
   userRegistration,
   authenticate,

@@ -2,6 +2,7 @@ const {
   findAll,
   createTable,
   updateTable,
+  deleteTable,
 } = require("../services/tableService");
 
 const getTables = async (req, res) => {
@@ -28,7 +29,6 @@ const createRestaurantTable = async (req, res) => {
 const updateRestaurantTable = async (req, res, next) => {
   const { number } = req.params;
   const { capacity, status } = req.body;
-  //console.log(capacity);
   try {
     const table = await updateTable(number, capacity, status);
     return res.status(200).json({ table });
@@ -36,7 +36,22 @@ const updateRestaurantTable = async (req, res, next) => {
     console.log(err);
     next(err);
   }
-  //return res.status(201).json({});
 };
 
-module.exports = { getTables, createRestaurantTable, updateRestaurantTable };
+const deleteRestauranteTable = async (req, res, next) => {
+  const { number } = req.params;
+  try {
+    await deleteTable(number);
+    return res.status(204).json({});
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+module.exports = {
+  getTables,
+  createRestaurantTable,
+  updateRestaurantTable,
+  deleteRestauranteTable,
+};
