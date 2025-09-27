@@ -25,5 +25,23 @@ const findUserByEmail = async (email, password) => {
   }
   return userExist;
 };
+const findUserById = async (id) => {
+  const userExist = await User.findOne({ where: { id: id } });
+  if (!userExist) {
+    throw new Error();
+  }
 
-module.exports = { createUser, findUserByEmail };
+  return userExist;
+};
+
+const findUsers = async () => {
+  try {
+    return await User.findAll({
+      attributes: { exclude: ["password"] },
+    });
+  } catch (error) {
+    throw new Error("Error getting users");
+  }
+};
+
+module.exports = { createUser, findUserByEmail, findUserById, findUsers };

@@ -2,7 +2,8 @@ const express = require("express");
 const app = express();
 const dotenv = require("dotenv").config();
 const { dbConnect } = require("../config/db");
-const router = require("../routes/authRoutes");
+const authRouter = require("../routes/authRoutes");
+const userRouter = require("../routes/userRoutes");
 
 // ---------- Database Connection ----------
 // Establishes connection with the PostgreSQL database
@@ -28,4 +29,7 @@ app.get("/", async (req, res) => {
 });
 
 // Auth endpoint: /auth
-app.use("/auth", router);
+app.use("/auth", authRouter);
+
+// Users endpoint: /users
+app.use("/users", userRouter);

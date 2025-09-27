@@ -1,6 +1,11 @@
 const { body } = require("express-validator");
-const { createUser, findUserByEmail } = require("../services/userService");
+const {
+  createUser,
+  findUserByEmail,
+  findUserById,
+} = require("../services/userService");
 const { comparePassword, hash } = require("../utils/hash");
+const { verifyToken } = require("../utils/token");
 
 const registerValidatonFields = [
   body("name").notEmpty().withMessage("You must provide a name"),
@@ -88,9 +93,43 @@ const userRegistration = async (req, res, next) => {
   }
 };
 
+const authenticate = async (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  //console.log(authHeader);
+  if (!authHeader) {
+    return res.status(401).json({ error: "No Authorization header" });
+  }
+  const [scheme, token] = authHeader.split(" ");
+  //console.log(token);
+  try {
+    const decode = await verifyToken(token);
+    //console.log(decode);
+    const userId = decode.id;
+    //console.log(userId);
+    const user = await findUserById(userId);
+    req.user = user;
+    next();
+    /** 
+     * 
+    return res.status(201).json({
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+    */
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Invalid Token" });
+  }
+};
+
 module.exports = {
   registerValidatonFields,
   loginValidatonFields,
   userAuthentication,
   userRegistration,
+  authenticate,
 };

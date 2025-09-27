@@ -1,2 +1,13 @@
-const User = require("../models/user");
-const { createUser, findUserByEmail } = require("../services/userService");
+const { findUsers } = require("../services/userService");
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await findUsers();
+    return res.status(200).json({ users });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "Ooops...something went wrong" });
+  }
+};
+
+module.exports = getUsers;

@@ -14,8 +14,9 @@ const verifyToken = async (token) => {
   try {
     return jwt.verify(token, process.env.JWT_SECRET);
   } catch (error) {
-    console.log(`Error generating token: ${error}`);
-    return res.status(500).json({ msg: "Ooops...something went wrong :(" });
+    console.log(`Error vallidating token`);
+    throw new Error("Error validating token");
+    //return res.status(500).json({ msg: "Ooops...something went wrong :(" });
   }
 };
 
