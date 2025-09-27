@@ -5,7 +5,7 @@ const {
   registerValidatonFields,
   loginValidatonFields,
 } = require("../middlewares/authMiddleware");
-const validateResult = require("../middlewares/validateResult");
+const { validateResult } = require("../middlewares/validations");
 const generateToken = require("../middlewares/generateToken");
 const router = express.Router();
 
