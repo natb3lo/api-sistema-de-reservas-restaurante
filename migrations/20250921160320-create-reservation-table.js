@@ -25,8 +25,8 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "RestaurantTable", // tabela que contém as mesas
-          key: "number", // coluna PK da tabela RestaurantTable
+          model: "RestaurantTable",
+          key: "number",
         },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
@@ -35,8 +35,8 @@ module.exports = {
         type: Sequelize.UUID,
         allowNull: false,
         references: {
-          model: "User", // tabela User
-          key: "id", // coluna PK da tabela User
+          model: "User",
+          key: "id",
         },
         onUpdate: "CASCADE",
         onDelete: "SET NULL",

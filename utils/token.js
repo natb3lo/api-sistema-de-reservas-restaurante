@@ -16,7 +16,6 @@ const verifyToken = async (token) => {
   } catch (error) {
     console.log(`Error vallidating token`);
     throw new Error("Error validating token");
-    //return res.status(500).json({ msg: "Ooops...something went wrong :(" });
   }
 };
 

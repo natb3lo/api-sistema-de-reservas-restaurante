@@ -13,7 +13,6 @@ const createUser = async (name, email, password) => {
     });
     return user;
   } catch (error) {
-    //console.log(error);
     throw new Error(`Error creating an User`);
   }
 };
@@ -25,8 +24,12 @@ const findUserByEmail = async (email, password) => {
   }
   return userExist;
 };
+
 const findUserById = async (id) => {
-  const userExist = await User.findOne({ where: { id: id } });
+  const userExist = await User.findOne({
+    where: { id: id },
+    attributes: { exclude: ["password"] },
+  });
   if (!userExist) {
     throw new Error();
   }

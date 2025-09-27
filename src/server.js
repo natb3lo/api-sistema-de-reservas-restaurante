@@ -4,6 +4,7 @@ const dotenv = require("dotenv").config();
 const { dbConnect } = require("../config/db");
 const authRouter = require("../routes/authRoutes");
 const userRouter = require("../routes/userRoutes");
+const tableRouter = require("../routes/tableRoutes");
 
 // ---------- Database Connection ----------
 // Establishes connection with the PostgreSQL database
@@ -33,3 +34,6 @@ app.use("/auth", authRouter);
 
 // Users endpoint: /users
 app.use("/users", userRouter);
+
+// Tables endpoint: /tables
+app.use("/tables", tableRouter);
