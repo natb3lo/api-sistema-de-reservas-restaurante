@@ -3,11 +3,13 @@ const { authenticate } = require("../middlewares/authMiddleware");
 const {
   getTables,
   createRestaurantTable,
+  updateRestaurantTable,
 } = require("../controllers/tableController");
 const authorize = require("../middlewares/authorization");
 const {
   validateCreateTableFields,
   validateResult,
+  validateUpdateTableFields,
 } = require("../middlewares/validations");
 const router = express.Router();
 
@@ -22,6 +24,15 @@ router.post(
   authenticate,
   authorize(new Set(["ADMIN"])),
   createRestaurantTable
+);
+
+router.patch(
+  "/:number",
+  validateUpdateTableFields,
+  validateResult,
+  authenticate,
+  authorize(new Set(["ADMIN"])),
+  updateRestaurantTable
 );
 
 module.exports = router;

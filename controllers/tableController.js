@@ -1,4 +1,8 @@
-const { findAll, createTable } = require("../services/tableService");
+const {
+  findAll,
+  createTable,
+  updateTable,
+} = require("../services/tableService");
 
 const getTables = async (req, res) => {
   try {
@@ -12,7 +16,6 @@ const getTables = async (req, res) => {
 
 const createRestaurantTable = async (req, res) => {
   const { number, capacity } = req.body;
-  console.log(number);
   try {
     const table = await createTable(number, capacity);
     return res.status(201).json({ table });
@@ -22,4 +25,18 @@ const createRestaurantTable = async (req, res) => {
   }
 };
 
-module.exports = { getTables, createRestaurantTable };
+const updateRestaurantTable = async (req, res, next) => {
+  const { number } = req.params;
+  const { capacity, status } = req.body;
+  //console.log(capacity);
+  try {
+    const table = await updateTable(number, capacity, status);
+    return res.status(200).json({ table });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+  //return res.status(201).json({});
+};
+
+module.exports = { getTables, createRestaurantTable, updateRestaurantTable };
