@@ -11,12 +11,9 @@ const { toLocalTime } = require("../utils/parseDate");
 const TIME_ZONE_OFFSET = -3; // fuso horário local
 
 const findAll = async () => {
-  //console.log(date);
-  //console.log(hour);
   try {
     const tables = await RestaurantTable.findAll({
       order: [["number", "ASC"]],
-      //attributes: { exclude: ["status"] },
     });
     return tables;
   } catch (err) {

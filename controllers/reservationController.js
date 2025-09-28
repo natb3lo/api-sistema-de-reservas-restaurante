@@ -1,5 +1,7 @@
-const registerReservationService = require("../services/reservationService");
-const makeReservationService = require("../services/reservationService");
+const {
+  registerReservationService,
+  getReservationsOfUser,
+} = require("../services/reservationService");
 const { parseDateToUTC, parseHourToInteger } = require("../utils/parseDate");
 
 const registerReservation = async (req, res, next) => {
@@ -22,4 +24,15 @@ const registerReservation = async (req, res, next) => {
   }
 };
 
-module.exports = registerReservation;
+const getReservations = async (req, res, next) => {
+  const user = req.user;
+  try {
+    const reservations = await getReservationsOfUser(user);
+    return res.status(200).json({ reservations });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+module.exports = { registerReservation, getReservations };

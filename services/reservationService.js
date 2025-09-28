@@ -2,6 +2,7 @@ const RestaurantTable = require("../models/restaurantTable");
 const Reservation = require("../models/reservation");
 const AppError = require("../exceptions/AppError");
 const ReservationStatus = require("../enums/reservationStatus");
+const { userAuthentication } = require("../middlewares/authMiddleware");
 
 const registerReservationService = async (
   tableNumber,
@@ -64,4 +65,15 @@ const registerReservationService = async (
   }
 };
 
-module.exports = registerReservationService;
+const getReservationsOfUser = async (user) => {
+  try {
+    const reservations = await Reservation.findAll({
+      where: { userId: user.id },
+    });
+    return reservations;
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports = { registerReservationService, getReservationsOfUser };

@@ -5,9 +5,15 @@ const {
   validateResult,
   validateRegisterReservationFields,
 } = require("../middlewares/validations");
-const registerReservation = require("../controllers/reservationController");
+const {
+  registerReservation,
+  getReservations,
+} = require("../controllers/reservationController");
 const router = express.Router();
 
+router.get("/", authenticate, getReservations);
+
+// POST: /reservations
 router.post(
   "/",
   validateRegisterReservationFields,
