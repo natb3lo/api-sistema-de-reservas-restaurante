@@ -1,6 +1,12 @@
 const { body } = require("express-validator");
 const { validationResult } = require("express-validator");
 const TableStatus = require("../enums/tableStatus");
+const {
+  parseReservationDateTime,
+  parseBrazilianDate,
+  parseDateToUTC,
+  parseToLocalDate,
+} = require("../utils/parseDate");
 
 const validateCreateTableFields = [
   body("number")
@@ -66,6 +72,58 @@ const validateRegisterFields = [
   }),
 ];
 
+const validateRegisterReservationFields = [
+  body("tableNumber")
+    .notEmpty()
+    .withMessage("You must provide the table number")
+    .isNumeric()
+    .withMessage("Only numeric values are allowed"),
+
+  body("date")
+    .notEmpty()
+    .withMessage("You must provide a reservation date")
+    .matches(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/)
+    .withMessage("Date must be in YYYY-MM-DD format"),
+
+  body("hour")
+    .notEmpty()
+    .withMessage("You must provide a reservation hour")
+    .matches(/^([01]\d|2[0-3]):([0-5]\d)$/)
+    .withMessage("Hour must be in HH:MM format"),
+
+  body("duration")
+    .notEmpty()
+    .withMessage("You must provide a duration")
+    .matches(/^([01]\d|2[0-3]):([0-5]\d)$/)
+    .withMessage("Duration must be in HH:MM format"),
+
+  body("numberOfPeople")
+    .notEmpty()
+    .withMessage("You must provide the number of people")
+    .isInt({ min: 1 })
+    .withMessage("Number of people must be a positive integer"),
+];
+
+/** 
+ * 
+const validateDate = (req, res, next) => {
+  const dateUTC = parseDateToUTC(req.body.date, req.body.hour);
+  //const [year, month, day] = req.body.reservationDate.split("-");
+  //const [hour, minute] = req.body.reservationHour.split(":");
+  //console.log(hour);
+  const { reservationDate, reservationHour } = req.body;
+  console.log("reservation date: " + reservationDate);
+  console.log("reservation hour: " + reservationHour);
+  parseBrazilianDate(reservationDate);
+  req.body.DateUTC = dateUTC;
+  //const reservationDateUTC = req.body.reservationDate;
+  //console.log(dateUTC);
+  //const localDate = parseToLocalDate(dateUTC);
+  //console.log(localDate);
+  next();
+};
+*/
+
 const validateLoginFields = (req, res, next) => {
   const authHeader = req.headers.authorization;
   console.log(authHeader);
@@ -98,4 +156,5 @@ module.exports = {
   validateUpdateTableFields,
   validateRegisterFields,
   validateLoginFields,
+  validateRegisterReservationFields,
 };

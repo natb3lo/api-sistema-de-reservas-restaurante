@@ -14,7 +14,7 @@ Reservation.init(
       allowNull: false,
       primaryKey: true,
     },
-    reservationDate: {
+    date: {
       type: DataTypes.DATE,
       allowNull: false,
     },
@@ -22,6 +22,11 @@ Reservation.init(
       type: DataTypes.ENUM(...Object.values(ReservationStatus)),
       allowNull: false,
       defaultValue: ReservationStatus.ACTIVE,
+    },
+    duration: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 60,
     },
   },
   {
@@ -36,7 +41,7 @@ Reservation.belongsTo(RestaurantTable, {
   foreignKey: "tableNumber",
 });
 
-Table.hasMany(Reservation, {
+RestaurantTable.hasMany(Reservation, {
   foreignKey: "tableNumber",
 });
 

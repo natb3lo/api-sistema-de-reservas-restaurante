@@ -5,6 +5,7 @@ const { dbConnect } = require("../config/db");
 const authRouter = require("../routes/authRoutes");
 const userRouter = require("../routes/userRoutes");
 const tableRouter = require("../routes/tableRoutes");
+const reservationRouter = require("../routes/reservationRoutes");
 const errorHandler = require("../middlewares/errorHandler");
 
 // ---------- Database Connection ----------
@@ -30,6 +31,9 @@ app.use("/users", userRouter);
 
 // Tables endpoint: /tables
 app.use("/tables", tableRouter);
+
+// Reservations endpoint: /reservations
+app.use("/reservations", reservationRouter);
 
 // Global error handlerS
 app.use(errorHandler);

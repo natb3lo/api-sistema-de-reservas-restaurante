@@ -7,7 +7,12 @@ const {
 
 const getTables = async (req, res) => {
   try {
-    const tables = await findAll();
+    const { date, hour } = req.query;
+    if (!date || !hour) {
+      const tables = await findAll();
+      return res.status(200).json({ tables });
+    }
+    const tables = await await findAll(date, hour);
     return res.status(200).json({ tables });
   } catch (error) {
     console.log(error);
