@@ -4,19 +4,15 @@ const {
   updateTable,
   deleteTable,
 } = require("../services/tableService");
+const { parseDateToUTC } = require("../utils/parseDate");
 
-const getTables = async (req, res) => {
+const getTables = async (req, res, next) => {
   try {
-    const { date, hour } = req.query;
-    if (!date || !hour) {
-      const tables = await findAll();
-      return res.status(200).json({ tables });
-    }
-    const tables = await await findAll(date, hour);
+    const tables = await findAll();
     return res.status(200).json({ tables });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ msg: "Ooops...something went wrong" });
+  } catch (err) {
+    console.log(err);
+    next(err);
   }
 };
 
