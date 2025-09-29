@@ -1,6 +1,10 @@
-const { body } = require("express-validator");
-const { validationResult } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 const TableStatus = require("../enums/tableStatus");
+const AppError = require("../exceptions/AppError");
+const express = require("express");
+const app = express();
+
+app.use(express.json()); // 🔹 MUITO IMPORTANTE
 
 const validateCreateTableFields = [
   body("number")
@@ -18,7 +22,19 @@ const validateCreateTableFields = [
 const validateResult = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const formattedErrors = errors.array().map((err) => ({
+      field: err.path,
+      message: err.msg,
+    }));
+    //console.log(formattedErrors);
+    return next(
+      new AppError(
+        "Validation failed",
+        400,
+        "VALIDATION_ERROR",
+        formattedErrors
+      )
+    );
   }
 
   next();
@@ -47,23 +63,26 @@ const validateUpdateTableFields = [
 ];
 
 const validateRegisterFields = [
-  body("name").notEmpty().withMessage("You must provide a name"),
+  body("name").notEmpty().withMessage("You must provide a name."),
   body("email")
     .notEmpty()
-    .withMessage("You must provide an e-mail address")
+    .withMessage("You must provide an e-mail address.")
     .isEmail()
-    .withMessage("Not a valid e-mail address"),
+    .withMessage("Not a valid e-mail address."),
   body("password")
     .notEmpty()
-    .withMessage("You must provide a password")
+    .withMessage("You must provide a password.")
     .isLength({ min: 5 })
-    .withMessage("Password must have at least 5 characters"),
-  body("passwordConfirmation").custom((value, { req }) => {
-    if (value !== req.body.password) {
-      throw new Error("Passwords do not match");
-    }
-    return true;
-  }),
+    .withMessage("Password must have at least 5 characters."),
+  body("passwordConfirmation")
+    .notEmpty()
+    .withMessage("You must confirm your password.")
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Passwords do not match.");
+      }
+      return true;
+    }),
 ];
 
 const validateRegisterReservationFields = [
@@ -110,24 +129,56 @@ const validateRegisterReservationFields = [
 
 const validateLoginFields = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  console.log(authHeader);
+  //console.log(authHeader);
   if (!authHeader) {
+    return next(
+      new AppError("Login validation failed", 400, "AUTH_ERROR", [
+        {
+          field: "authorization",
+          message: "Authorization is required. Use: Basic <base64>.",
+        },
+      ])
+    );
+    /**
+     * 
     return res.status(400).json({
       error:
-        "[AUTH_ERROR] Missing Authorization header. Use: Basic Auth <base64>",
+      "[AUTH_ERROR] Missing Authorization header. Use: Basic Auth <base64>",
     });
+    */
   }
   if (!authHeader.startsWith("Basic ")) {
+    return next(
+      new AppError("Login validation failed", 400, "AuUTH_ERROR", [
+        {
+          field: "authorization",
+          message: "Authorization header must start with 'Basic '",
+        },
+      ])
+    );
+    /**
+     * 
     return res.status(400).json({
       error:
-        "[AUTH_ERROR] Invalid Authorization header. Use: Basic Auth <base64>",
+      "[AUTH_ERROR] Invalid Authorization header. Use: Basic Auth <base64>",
     });
+    */
   }
 
   const [, hash] = authHeader.split(" ");
   console.log(hash);
   const [email, password] = Buffer.from(hash, "base64").toString().split(":");
-  console.log("email: " + email + " password: " + password);
+  //console.log("email: " + email + " password: " + password);
+  if (!email || !password) {
+    return next(
+      new AppError("Login validation failed", 400, "AUTH_ERROR", [
+        {
+          field: "authorization",
+          message: "Email or password is missing in Basic Auth.",
+        },
+      ])
+    );
+  }
 
   req.auth = { email, password };
 

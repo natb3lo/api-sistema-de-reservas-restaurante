@@ -5,19 +5,31 @@ const {
 } = require("../services/userService");
 const { comparePassword, hash } = require("../utils/hash");
 const { verifyToken } = require("../utils/token");
+const AppError = require("../exceptions/AppError");
 
 const userAuthentication = async (req, res, next) => {
   const { email, password } = req.auth;
 
   try {
     const user = await findUserByEmail(email);
-    console.log(user);
-    console.log("provided: " + password + "compared: " + user.password);
+    //console.log(user);
+    //console.log("provided: " + password + "compared: " + user.password);
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) {
+      return next(
+        new AppError("Invalid credentials", 401, "AUTH_ERROR", [
+          {
+            field: "email/password",
+            message: "The provided credentials are incorrect.",
+          },
+        ])
+      );
+      /** 
+       * 
       return res
-        .status(401)
-        .json({ error: "[AUTH_ERROR] Invalid credentials" });
+      .status(401)
+      .json({ error: "[AUTH_ERROR] Invalid credentials" });
+      */
     }
     req.user = {
       id: user.id,
@@ -27,8 +39,13 @@ const userAuthentication = async (req, res, next) => {
     };
     next();
   } catch (error) {
-    console.log(error.message);
-    return res.status(401).json({ error: error.message });
+    //console.log(error.message);
+    return next(
+      new AppError("Invalid credentials", 401, "AUTH_ERROR", [
+        { field: "email", message: "No user found with this email" },
+      ])
+    );
+    //return res.status(401).json({ error: error.message });
   }
 };
 
