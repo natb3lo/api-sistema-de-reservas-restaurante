@@ -1,14 +1,18 @@
 const {
   registerReservationService,
   getReservationsOfUser,
+  cancelReservationService,
 } = require("../services/reservationService");
-const { parseDateToUTC, parseHourToInteger } = require("../utils/parseDate");
+const {
+  parseDateToUTC,
+  parseHourToInteger,
+  parseToLocalDate,
+} = require("../utils/parseDate");
 
 const registerReservation = async (req, res, next) => {
   const { tableNumber, date, hour, duration, numberOfPeople } = req.body;
   const dateUTC = parseDateToUTC(date, hour);
   const durationInt = parseHourToInteger(duration);
-  //console.log(durationInt);
   try {
     const reservation = await registerReservationService(
       tableNumber,
@@ -27,7 +31,16 @@ const registerReservation = async (req, res, next) => {
 const getReservations = async (req, res, next) => {
   const user = req.user;
   try {
-    const reservations = await getReservationsOfUser(user);
+    const rawReservations = await getReservationsOfUser(user);
+
+    // Transforms the date from UTC to Local Time
+    const reservations = rawReservations.map((r) => {
+      const localDate = parseToLocalDate(new Date(r.dataValues.date));
+      return {
+        ...r.dataValues,
+        date: localDate,
+      };
+    });
     return res.status(200).json({ reservations });
   } catch (err) {
     console.log(err);
@@ -35,4 +48,15 @@ const getReservations = async (req, res, next) => {
   }
 };
 
-module.exports = { registerReservation, getReservations };
+const cancelReservation = async (req, res, next) => {
+  const user = req.user;
+  const reservationId = req.params.id;
+  try {
+    await cancelReservationService(reservationId, user);
+    return res.status(200).json({ msg: "Reservation canceled" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { registerReservation, getReservations, cancelReservation };

@@ -4,7 +4,6 @@ const {
   updateTable,
   deleteTable,
 } = require("../services/tableService");
-const { parseDateToUTC } = require("../utils/parseDate");
 
 const getTables = async (req, res, next) => {
   try {

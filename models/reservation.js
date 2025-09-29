@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes, Model } = require("sequelize");
+const { DataTypes, Model } = require("sequelize");
 const { sequelize } = require("../config/db");
 const ReservationStatus = require("../enums/reservationStatus");
 const RestaurantTable = require("./restaurantTable");

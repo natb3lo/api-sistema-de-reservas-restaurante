@@ -1,4 +1,3 @@
-const { body } = require("express-validator");
 const {
   createUser,
   findUserByEmail,

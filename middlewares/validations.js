@@ -1,12 +1,6 @@
 const { body } = require("express-validator");
 const { validationResult } = require("express-validator");
 const TableStatus = require("../enums/tableStatus");
-const {
-  parseReservationDateTime,
-  parseBrazilianDate,
-  parseDateToUTC,
-  parseToLocalDate,
-} = require("../utils/parseDate");
 
 const validateCreateTableFields = [
   body("number")
@@ -89,7 +83,17 @@ const validateRegisterReservationFields = [
     .notEmpty()
     .withMessage("You must provide a reservation hour")
     .matches(/^([01]\d|2[0-3]):([0-5]\d)$/)
-    .withMessage("Hour must be in HH:MM format"),
+    .withMessage("Hour must be in HH:MM format")
+    .custom((v) => {
+      const [hour, minutes] = v.split(":").map(Number);
+      if (hour >= 22 || hour < 9) {
+        throw new Error(
+          "Reservations are only allowed between 09:00 and 22:00"
+        );
+      }
+
+      return true;
+    }),
 
   body("duration")
     .notEmpty()
@@ -103,26 +107,6 @@ const validateRegisterReservationFields = [
     .isInt({ min: 1 })
     .withMessage("Number of people must be a positive integer"),
 ];
-
-/** 
- * 
-const validateDate = (req, res, next) => {
-  const dateUTC = parseDateToUTC(req.body.date, req.body.hour);
-  //const [year, month, day] = req.body.reservationDate.split("-");
-  //const [hour, minute] = req.body.reservationHour.split(":");
-  //console.log(hour);
-  const { reservationDate, reservationHour } = req.body;
-  console.log("reservation date: " + reservationDate);
-  console.log("reservation hour: " + reservationHour);
-  parseBrazilianDate(reservationDate);
-  req.body.DateUTC = dateUTC;
-  //const reservationDateUTC = req.body.reservationDate;
-  //console.log(dateUTC);
-  //const localDate = parseToLocalDate(dateUTC);
-  //console.log(localDate);
-  next();
-};
-*/
 
 const validateLoginFields = (req, res, next) => {
   const authHeader = req.headers.authorization;

@@ -35,7 +35,7 @@ app.use("/tables", tableRouter);
 // Reservations endpoint: /reservations
 app.use("/reservations", reservationRouter);
 
-// Global error handlerS
+// Global error handler
 app.use(errorHandler);
 
 // --------Server Startup------

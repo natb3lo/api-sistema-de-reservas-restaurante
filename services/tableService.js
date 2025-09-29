@@ -1,14 +1,5 @@
 const RestaurantTable = require("../models/restaurantTable");
 const AppError = require("../exceptions/AppError");
-const Reservation = require("../models/reservation");
-const { add } = require("date-fns");
-const TableStatus = require("../enums/tableStatus");
-const { check } = require("express-validator");
-const { Op } = require("sequelize");
-const { utcToZonedTime } = require("date-fns-tz");
-const { toLocalTime } = require("../utils/parseDate");
-
-const TIME_ZONE_OFFSET = -3; // fuso horário local
 
 const findAll = async () => {
   try {

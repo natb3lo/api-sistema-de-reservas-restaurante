@@ -2,7 +2,7 @@ const RestaurantTable = require("../models/restaurantTable");
 const Reservation = require("../models/reservation");
 const AppError = require("../exceptions/AppError");
 const ReservationStatus = require("../enums/reservationStatus");
-const { userAuthentication } = require("../middlewares/authMiddleware");
+const TableStatus = require("../enums/tableStatus");
 
 const registerReservationService = async (
   tableNumber,
@@ -28,15 +28,21 @@ const registerReservationService = async (
         400
       );
     }
+    if (table.status == TableStatus.UNAVAILABLE) {
+      throw new AppError("The table is not available for reservations", 400);
+    }
     const reservations = await Reservation.findAll({
       where: {
         tableNumber: tableNumber,
       },
     });
     const isReserved = reservations.some((r) => {
-      const currentReservationStart = new Date(r.dataValues.date);
+      if (r.status == ReservationStatus.CANCELED) {
+        return false;
+      }
+      const currentReservationStart = new Date(r.date);
       const currentReservationEnd = new Date(
-        currentReservationStart.getTime() + r.dataValues.duration * 60000
+        currentReservationStart.getTime() + r.duration * 60000
       );
       return (
         requestedReservationDate < currentReservationEnd &&
@@ -76,4 +82,23 @@ const getReservationsOfUser = async (user) => {
   }
 };
 
-module.exports = { registerReservationService, getReservationsOfUser };
+const cancelReservationService = async (reservationId, user) => {
+  try {
+    const reservation = await Reservation.findOne({
+      where: { userId: user.id, id: reservationId },
+    });
+    if (!reservation) {
+      throw new AppError("Invalid reservation id", 400);
+    }
+    reservation.status = ReservationStatus.CANCELED;
+    await reservation.save();
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports = {
+  registerReservationService,
+  getReservationsOfUser,
+  cancelReservationService,
+};

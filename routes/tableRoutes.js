@@ -37,6 +37,7 @@ router.patch(
   updateRestaurantTable
 );
 
+// DELETE:: /tables/{number}
 router.delete(
   "/:number",
   authenticate,
