@@ -20,16 +20,33 @@ const registerReservationService = async (
       where: { number: tableNumber },
     });
     if (!table) {
-      throw new AppError("Provided table number does not exist", 400);
+      throw new AppError(
+        "Provided table number does not exist",
+        400,
+        "RESERVATION_ERROR",
+        [{ field: "tableNumber", message: "No table found with this number" }]
+      );
     }
     if (numberOfPeople > table.capacity) {
       throw new AppError(
         "The table capacity does not support this amount of people",
-        400
+        400,
+        "RESERVATION_ERROR",
+        [
+          {
+            field: "numberOfPeople",
+            message: "Number of people exceeds table capacity",
+          },
+        ]
       );
     }
     if (table.status == TableStatus.UNAVAILABLE) {
-      throw new AppError("The table is not available for reservations", 400);
+      throw new AppError(
+        "The table is not available for reservations",
+        400,
+        "RESERVATION_ERROR",
+        [{ field: "tableNumber", message: "Table is currently unavailable" }]
+      );
     }
     const reservations = await Reservation.findAll({
       where: {
@@ -53,7 +70,14 @@ const registerReservationService = async (
     if (isReserved) {
       throw new AppError(
         "The table is not available for reservation at the selected time.",
-        400
+        400,
+        "RESERVATION_ERROR",
+        [
+          {
+            field: "date/hour",
+            message: "Selected table is already reserved at this time",
+          },
+        ]
       );
     }
 
@@ -66,8 +90,21 @@ const registerReservationService = async (
     });
 
     return reservation;
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      "Reservation creation failed",
+      500,
+      "RESERVATION_ERROR",
+      [
+        {
+          field: null,
+          message: "An unexpected error occurred while creating reservation",
+        },
+      ]
+    );
   }
 };
 
@@ -77,8 +114,18 @@ const getReservationsOfUser = async (user) => {
       where: { userId: user.id },
     });
     return reservations;
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    throw new AppError(
+      "Failed to fetch user reservations",
+      500,
+      "RESERVATION_ERROR",
+      [
+        {
+          field: null,
+          message: "An unexpected error occurred while fetching reservations",
+        },
+      ]
+    );
   }
 };
 
@@ -88,12 +135,30 @@ const cancelReservationService = async (reservationId, user) => {
       where: { userId: user.id, id: reservationId },
     });
     if (!reservation) {
-      throw new AppError("Invalid reservation id", 400);
+      throw new AppError("Invalid reservation id", 400, "RESERVATION_ERROR", [
+        {
+          field: "reservationId",
+          message: "No reservation found with this id for the user",
+        },
+      ]);
     }
     reservation.status = ReservationStatus.CANCELED;
     await reservation.save();
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw new AppError(
+      "Reservation cancellation failed",
+      500,
+      "RESERVATION_ERROR",
+      [
+        {
+          field: null,
+          message: "An unexpected error occurred while canceling reservation",
+        },
+      ]
+    );
   }
 };
 

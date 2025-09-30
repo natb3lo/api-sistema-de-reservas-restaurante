@@ -1,6 +1,5 @@
 const errorHandler = (err, req, res, next) => {
   const status = err.statusCode || 500;
-  //console.log(err);
 
   //Logs
   console.error(
@@ -17,7 +16,9 @@ const errorHandler = (err, req, res, next) => {
     .status(status)
     .type("application/problem+json")
     .json({
-      type: `http://localhost:4000/probs/${err.code || "internal-error"}`,
+      type: `http://localhost:${process.env.PORT}/probs/${
+        err.code || "internal-error"
+      }`,
       title:
         err.code === "VALIDATION_ERROR"
           ? "Invalid request parameters."
@@ -27,14 +28,6 @@ const errorHandler = (err, req, res, next) => {
       instance: req.originalUrl,
       ...(err.details ? { errors: err.details } : {}),
     });
-  /**
-     * 
-    if (err.isOperational) {
-      return res.status(err.statusCode).json({ error: err.message });
-    }
-    
-    res.status(500).json({ error: "Ooops...something went wrong" });
-    */
 };
 
 module.exports = errorHandler;

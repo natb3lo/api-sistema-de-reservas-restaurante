@@ -13,7 +13,7 @@ const createUser = async (name, email, password) => {
     });
     return user;
   } catch (error) {
-    throw new Error(`Error creating an User`);
+    throw new Error(`Error creating User`);
   }
 };
 
@@ -43,7 +43,12 @@ const findUsers = async () => {
       attributes: { exclude: ["password"] },
     });
   } catch (error) {
-    throw new Error("Error getting users");
+    throw new AppError("Failed to fetch users", 500, "USER_ERROR", [
+      {
+        field: null,
+        message: "An unexpected error occurred while fetching users",
+      },
+    ]);
   }
 };
 

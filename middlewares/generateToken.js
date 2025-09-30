@@ -14,8 +14,15 @@ const generateToken = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.log(error.message);
-    return res.status(500).json({ msg: "Ooops...something went wrong :(" });
+    //console.log(error.message);
+    return next(
+      new AppError("Token generation failed", 500, "TOKEN_ERROR", [
+        {
+          field: null,
+          message: "An unexpected error occurred while generating the token",
+        },
+      ])
+    );
   }
 };
 

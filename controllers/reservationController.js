@@ -22,9 +22,9 @@ const registerReservation = async (req, res, next) => {
       req.user.id
     );
     return res.status(201).json({ reservation });
-  } catch (err) {
-    console.log(err);
-    next(err);
+  } catch (error) {
+    //console.log(err);
+    next(error);
   }
 };
 
@@ -42,9 +42,9 @@ const getReservations = async (req, res, next) => {
       };
     });
     return res.status(200).json({ reservations });
-  } catch (err) {
-    console.log(err);
-    next(err);
+  } catch (error) {
+    console.log(error);
+    next(error);
   }
 };
 
@@ -53,9 +53,9 @@ const cancelReservation = async (req, res, next) => {
   const reservationId = req.params.id;
   try {
     await cancelReservationService(reservationId, user);
-    return res.status(200).json({ msg: "Reservation canceled" });
-  } catch (err) {
-    next(err);
+    return res.status(200).json({ message: "Reservation canceled" });
+  } catch (error) {
+    next(error);
   }
 };
 

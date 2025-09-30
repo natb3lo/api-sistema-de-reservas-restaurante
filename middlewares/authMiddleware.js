@@ -12,8 +12,6 @@ const userAuthentication = async (req, res, next) => {
 
   try {
     const user = await findUserByEmail(email);
-    //console.log(user);
-    //console.log("provided: " + password + "compared: " + user.password);
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) {
       return next(
@@ -24,12 +22,6 @@ const userAuthentication = async (req, res, next) => {
           },
         ])
       );
-      /** 
-       * 
-      return res
-      .status(401)
-      .json({ error: "[AUTH_ERROR] Invalid credentials" });
-      */
     }
     req.user = {
       id: user.id,
@@ -39,13 +31,14 @@ const userAuthentication = async (req, res, next) => {
     };
     next();
   } catch (error) {
-    //console.log(error.message);
     return next(
       new AppError("Invalid credentials", 401, "AUTH_ERROR", [
-        { field: "email", message: "No user found with this email" },
+        {
+          field: "email/password",
+          message: "The provided credentials are incorrect.",
+        },
       ])
     );
-    //return res.status(401).json({ error: error.message });
   }
 };
 
@@ -62,15 +55,38 @@ const userRegistration = async (req, res, next) => {
     };
     next();
   } catch (error) {
-    console.log(error.message);
-    return res.status(400).json({ error: error.message });
+    if (error.message.includes("Email already registered")) {
+      return next(
+        new AppError("User registration failed", 400, "USER_ERROR", [
+          {
+            field: "email",
+            message: "Email already registered.",
+          },
+        ])
+      );
+    }
+    return next(
+      new AppError("User registration failed", 400, "USER_ERROR", [
+        {
+          field: null,
+          message: "An unexpected error ocurred while creating the user",
+        },
+      ])
+    );
   }
 };
 
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   if (!authHeader) {
-    return res.status(401).json({ error: "No Authorization header" });
+    return next(
+      new AppError("User authentication failed", 401, "AUTH_ERROR", [
+        {
+          field: "authorization",
+          message: "No Bearer Token provided.",
+        },
+      ])
+    );
   }
   const [scheme, token] = authHeader.split(" ");
   try {
@@ -80,8 +96,14 @@ const authenticate = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ msg: "Invalid Token" });
+    return next(
+      new AppError("User authentication failed", 401, "AUTH_ERROR", [
+        {
+          field: "authorization",
+          message: "Invalid token.",
+        },
+      ])
+    );
   }
 };
 

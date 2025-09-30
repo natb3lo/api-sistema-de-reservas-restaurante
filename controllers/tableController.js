@@ -9,20 +9,18 @@ const getTables = async (req, res, next) => {
   try {
     const tables = await findAll();
     return res.status(200).json({ tables });
-  } catch (err) {
-    console.log(err);
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
-const createRestaurantTable = async (req, res) => {
+const createRestaurantTable = async (req, res, next) => {
   const { number, capacity } = req.body;
   try {
     const table = await createTable(number, capacity);
     return res.status(201).json({ table });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ msg: error.message });
+    next(error);
   }
 };
 
@@ -32,9 +30,8 @@ const updateRestaurantTable = async (req, res, next) => {
   try {
     const table = await updateTable(number, capacity, status);
     return res.status(200).json({ table });
-  } catch (err) {
-    console.log(err);
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -43,9 +40,8 @@ const deleteRestauranteTable = async (req, res, next) => {
   try {
     await deleteTable(number);
     return res.status(204).json({});
-  } catch (err) {
-    console.log(err);
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };
 

@@ -26,7 +26,6 @@ const validateResult = (req, res, next) => {
       field: err.path,
       message: err.msg,
     }));
-    //console.log(formattedErrors);
     return next(
       new AppError(
         "Validation failed",

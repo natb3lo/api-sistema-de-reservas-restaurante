@@ -7,9 +7,13 @@ const findAll = async () => {
       order: [["number", "ASC"]],
     });
     return tables;
-  } catch (err) {
-    console.log(err);
-    throw new AppError("Error fetching tables");
+  } catch (error) {
+    throw new AppError("Failed to fetch tables", 500, "TABLE_ERROR", [
+      {
+        field: null,
+        message: "An unexpected error occurred while fetching tables",
+      },
+    ]);
   }
 };
 
@@ -19,15 +23,20 @@ const createTable = async (number, capacity) => {
       where: { number: number },
     });
     if (tableExist) {
-      throw new Error("Restaurant Table number already registered");
+      throw new AppError("Table already registered.", 400, "USER_ERROR", [
+        {
+          field: "number",
+          message: `Table ${number} already registered.`,
+        },
+      ]);
     }
     const table = await RestaurantTable.create({
       number,
       capacity,
     });
     return table;
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    throw error;
   }
 };
 
@@ -35,14 +44,19 @@ const updateTable = async (number, capacity, status) => {
   try {
     const table = await RestaurantTable.findOne({ where: { number: number } });
     if (!table) {
-      throw new AppError("Provided table number does not exist", 400);
+      throw new AppError("Table does not exist", 400, "USER_ERROR", [
+        {
+          field: "number",
+          message: "Provided table number does not exist.",
+        },
+      ]);
     }
     table.capacity = capacity;
     table.status = status;
     await table.save();
     return table;
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    throw error;
   }
 };
 
@@ -50,11 +64,16 @@ const deleteTable = async (number) => {
   try {
     const table = await RestaurantTable.findOne({ where: { number: number } });
     if (!table) {
-      throw new AppError("Provided table number does not exist", 400);
+      throw new AppError("Table does not exist", 400, "USER_ERROR", [
+        {
+          field: "number",
+          message: "Provided table number does not exist.",
+        },
+      ]);
     }
     await table.destroy();
-  } catch (err) {
-    throw err;
+  } catch (error) {
+    throw error;
   }
 };
 
