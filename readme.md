@@ -1,6 +1,6 @@
 # API de Sistema de Reservas de Restaurante
 
-Este projeto é uma API RESTful para gerenciar reservas de mesas em um restaurante, com autenticação, validação de dados, controle de disponibilidade e logs padronizados.
+Este projeto é uma API RESTful que simula o gerenciamento de reservas de mesas em um restaurante, com login e cadastro de usuários e mesas, autenticação via JWT, solicitação e cancelamento de reservas de acordo com a disponibilidade operacional do restaurante.
 
 ## 🛠 Tecnologias Utilizadas
 
