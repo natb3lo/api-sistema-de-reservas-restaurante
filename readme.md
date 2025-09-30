@@ -9,7 +9,7 @@ Este projeto é uma API RESTful para gerenciar reservas de mesas em um restauran
 - [PostgreSQL](https://www.postgresql.org/) - Banco de dados relacional
 - [Sequelize](https://sequelize.org/) - ORM para interagir com o banco
 - [JWT](https://jwt.io/) - Autenticação via JSON Web Tokens
-- [Docker](https://www.docker.com/) - Containerização da aplicação (opcional)
+- [Docker](https://www.docker.com/) - Containerização do Banco de Dados
 
 ## 🔑 Funcionalidades
 
